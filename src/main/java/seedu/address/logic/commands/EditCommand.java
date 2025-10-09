@@ -3,9 +3,11 @@ package seedu.address.logic.commands;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_ADDRESS;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_EMAIL;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_GITHUB;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_TELEGRAM;
 import static seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS;
 
 import java.util.Collections;
@@ -23,9 +25,11 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
+import seedu.address.model.person.GitHub;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.Telegram;
 import seedu.address.model.tag.Tag;
 
 /**
@@ -43,6 +47,8 @@ public class EditCommand extends Command {
             + "[" + PREFIX_PHONE + "PHONE] "
             + "[" + PREFIX_EMAIL + "EMAIL] "
             + "[" + PREFIX_ADDRESS + "ADDRESS] "
+            + "[" + PREFIX_TELEGRAM + "TELEGRAM] "
+            + "[" + PREFIX_GITHUB + "GITHUB] "
             + "[" + PREFIX_TAG + "TAG]...\n"
             + "Example: " + COMMAND_WORD + " 1 "
             + PREFIX_PHONE + "91234567 "
@@ -103,8 +109,11 @@ public class EditCommand extends Command {
         // Merge existing tags with new tags
         Set<Tag> updatedTags = new HashSet<>(personToEdit.getTags()); // Start with existing tags
         editPersonDescriptor.getTags().ifPresent(tags -> updatedTags.addAll(tags)); // Add new tags if present
+        Telegram updatedTelegram = editPersonDescriptor.getTelegram().orElse(personToEdit.getTelegram()); // 🟩 ADDED
+        GitHub updatedGitHub = editPersonDescriptor.getGitHub().orElse(personToEdit.getGitHub());
 
-        return new Person(updatedName, updatedPhone, updatedEmail, updatedAddress, updatedTags);
+        return new Person(updatedName, updatedPhone, updatedEmail, updatedAddress, updatedTelegram,
+                updatedGitHub, updatedTags);
     }
 
     @Override
@@ -140,6 +149,8 @@ public class EditCommand extends Command {
         private Phone phone;
         private Email email;
         private Address address;
+        private Telegram telegram;
+        private GitHub github;
         private Set<Tag> tags;
 
         public EditPersonDescriptor() {}
@@ -153,6 +164,8 @@ public class EditCommand extends Command {
             setPhone(toCopy.phone);
             setEmail(toCopy.email);
             setAddress(toCopy.address);
+            setTelegram(toCopy.telegram);
+            setGitHub(toCopy.github);
             setTags(toCopy.tags);
         }
 
@@ -160,7 +173,7 @@ public class EditCommand extends Command {
          * Returns true if at least one field is edited.
          */
         public boolean isAnyFieldEdited() {
-            return CollectionUtil.isAnyNonNull(name, phone, email, address, tags);
+            return CollectionUtil.isAnyNonNull(name, phone, email, address, telegram, github, tags);
         }
 
         public void setName(Name name) {
@@ -186,6 +199,14 @@ public class EditCommand extends Command {
         public Optional<Email> getEmail() {
             return Optional.ofNullable(email);
         }
+
+        public void setTelegram(Telegram telegram) { this.telegram = telegram; }
+
+        public Optional<Telegram> getTelegram() { return Optional.ofNullable(telegram); }
+
+        public void setGitHub(GitHub github) { this.github = github; }
+
+        public Optional<GitHub> getGitHub() { return Optional.ofNullable(github); }
 
         public void setAddress(Address address) {
             this.address = address;
@@ -228,6 +249,8 @@ public class EditCommand extends Command {
                     && Objects.equals(phone, otherEditPersonDescriptor.phone)
                     && Objects.equals(email, otherEditPersonDescriptor.email)
                     && Objects.equals(address, otherEditPersonDescriptor.address)
+                    && Objects.equals(telegram, otherEditPersonDescriptor.telegram)
+                    && Objects.equals(github, otherEditPersonDescriptor.github)
                     && Objects.equals(tags, otherEditPersonDescriptor.tags);
         }
 
